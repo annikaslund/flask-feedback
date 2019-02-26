@@ -42,7 +42,7 @@ def register_user():
         db.session.add(new_user)
         db.session.commit()
 
-        session['user_id'] = new_user.id
+        session['user_id'] = new_user.username
         
         return redirect('/secret')
 
@@ -64,7 +64,7 @@ def login_user():
 
         if user:
             session["user_id"] = user.username
-            return redirect("/secret")
+            return redirect(f"/users/{user.username}")
 
         else:
             form.username.errors = ["Bad username or password"]
@@ -72,8 +72,22 @@ def login_user():
     return render_template('login_user.html', form=form)
 
 
-@app.route('/secret')
-def secret_page():
+@app.route('/users/<username>')
+def secret_page(username):
     """ Displays secret page if user is logged in """
 
-    return "You made it!"
+    user = User.query.get(username)
+
+    return render_template('user.html', username=user.username,
+                                        email=user.email,
+                                        first_name=user.first_name,
+                                        last_name=user.last_name)
+
+
+@app.route('/logout')
+def logout_user():
+    """ Logs user out of session and redirects to home page. """
+
+    session.pop("user_id")
+
+    return redirect("/")
