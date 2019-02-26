@@ -49,7 +49,7 @@ class User(db.Model):
 
         if user and bcrypt.check_password_hash(user.password, pwd):
             return user
-        else: 
+        else:
             return False
 
     # @classmethod

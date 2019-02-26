@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session 
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, connect_db, db
-from forms import RegisterUserForm
+from forms import RegisterUserForm, LoginForm
 
 
 app = Flask(__name__)
@@ -24,7 +24,7 @@ def redirect_to_register():
 
 @app.route('/register', methods=["GET", "POST"])
 def register_user():
-    """ Show register form, handles registering of users. """
+    """ Show register form or handle registering of users. """
 
     form = RegisterUserForm()
 
@@ -49,3 +49,25 @@ def register_user():
     else:
         return render_template(
             "register_user.html", form=form)
+
+
+@app.route('/login', methods=["GET", "POST"])
+def login_user():
+    """ Show login form or handle login """
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+
+        user = User.authenticate(username, password)
+
+        if user:
+            session["user_id"] = user.username
+            return redirect("/secret")
+
+        else:
+            form.username.errors = ["Bad username or password"]
+        
+    return render_template('login_user.html', form=form)
+
