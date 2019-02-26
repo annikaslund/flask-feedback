@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, connect_db, db
-# from forms import 
+from forms import RegisterUserForm
 
 
 app = Flask(__name__)
@@ -22,15 +22,13 @@ def redirect_to_register():
     return redirect('/register')
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET", "POST"])
 def register_user():
     """ Show register form, handles registering of users. """
 
-    form = AddSnackForm()
+    form = RegisterUserForm()
 
     if form.validate_on_submit():
-        # import pdb
-        # pdb.set_trace()
         name = form.name.data
         price = form.price.data
         return f"Add {name} at {price}"
@@ -38,4 +36,4 @@ def register_user():
 
     else:
         return render_template(
-            "snack_add_form.html", form=form)
+            "register_user.html", form=form)
