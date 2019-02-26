@@ -71,3 +71,9 @@ def login_user():
         
     return render_template('login_user.html', form=form)
 
+
+@app.route('/secret')
+def secret_page():
+    """ Displays secret page if user is logged in """
+
+    return "You made it!"
