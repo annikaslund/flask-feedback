@@ -41,6 +41,17 @@ class User(db.Model):
 
         return cls(username=username, password=hashed_utf8)
 
+    @classmethod
+    def authenticate(cls, username, pwd):
+        """ Validate that user exists and password is correct """
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and bcrypt.check_password_hash(user.password, pwd):
+            return user
+        else: 
+            return False
+
     # @classmethod
     # def check_if_email_exists(cls, email):
     #     ''' verifies if email is unique'''
