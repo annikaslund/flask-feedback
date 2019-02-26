@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, session 
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, connect_db, db
 from forms import RegisterUserForm
@@ -29,10 +29,22 @@ def register_user():
     form = RegisterUserForm()
 
     if form.validate_on_submit():
-        name = form.name.data
-        price = form.price.data
-        return f"Add {name} at {price}"
-        # redirect("/")
+        
+        username = form.username.data
+        password = form.password.data
+
+        new_user = User.register(username, password)
+
+        new_user.email = form.email.data
+        new_user.first_name = form.first_name.data
+        new_user.last_name = form.last_name.data
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        session['user_id'] = new_user.id
+        
+        return redirect('/secret')
 
     else:
         return render_template(

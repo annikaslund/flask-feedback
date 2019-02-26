@@ -40,3 +40,17 @@ class User(db.Model):
         hashed_utf8 = hashed.decode("utf8")
 
         return cls(username=username, password=hashed_utf8)
+
+    # @classmethod
+    # def check_if_email_exists(cls, email):
+    #     ''' verifies if email is unique'''
+    #     email_in_db = User.query.filter_by(email=email).first()
+
+    #     return email_in_db
+
+    # @classmethod
+    # def check_if_username_exists(cls, username):
+    #     ''' verifies if username is unique'''
+    #     username_in_db = User.query.filter_by(username=username).first()
+
+    #     return username_in_db

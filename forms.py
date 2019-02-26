@@ -17,3 +17,12 @@ class RegisterUserForm(FlaskForm):
                              validators=[Length(min=1, max=30, message="First name must be between 1 and 30 characters.")])
     last_name = StringField("Last name",
                             validators=[Length(min=1, max=30, message="Last name must be between 1 and 30 characters.")])
+
+
+class LoginForm(FlaskForm):
+    ''' Form for logging in '''
+
+    username = StringField("Username",
+                           validators=[Length(min=1, max=20, message="Username must be between 1 and 20 characters.")],)
+    password = PasswordField("Password",
+                             validators=[Length(min=1, message="Must put in a password.")])
