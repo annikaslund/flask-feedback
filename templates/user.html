@@ -4,8 +4,26 @@
 {% endblock %}
 
 {% block content %}
-    {% if 'user_id' in session %}
-    <h1>You made it! Welcome {{ first_name }}</h1>
-    <button><a href="/logout">Logout</a></button>
-    {% endif %}
+    
+    <h1>You made it! Welcome {{ first_name }} {{ last_name }}</h1>
+    <h2>You're logged in as <i>{{ username }}</i></h3>
+    <p>We have your email address.... ? It's {{ email }}</p>
+
+    <h3>Feedback</h3>
+    {% for feedback in feedback_list %}
+        <div>
+            <h5>{{feedback.title}}</h5>
+            <p>{{feedback.content}}</p>
+            <form>
+            <button formmethod="/feedback/{{feedback.id}}/update" formaction="GET">Edit</button>
+            <button formmethod="/feedback/{{feedback.id}}/delete" formaction="POST">Delete</button>
+            </form>
+        </div>
+    {% endfor %}
+    <a href="/logout">Logout</a>
+    <a href="/users/{{username}}/feedback/add">Add Feedback</a>
+    <form action="/users/{{username}}/delete" method="POST">
+        <button>Delete user {{username}}</button>
+    </form>
+    
 {% endblock %}

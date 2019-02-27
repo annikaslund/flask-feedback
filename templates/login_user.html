@@ -4,7 +4,9 @@
 
 {% block content %}
     <h1>Log-in:</h1>
-
+    {% for msg in get_flashed_messages() %}
+    {{ msg }}
+    {% endfor %}
 
     <form method="POST">
 
@@ -25,5 +27,5 @@
         <button type="submit">Submit</button>
     
     </form>
-
+    <a href="/register">Not a user yet?</a>
   {% endblock %}

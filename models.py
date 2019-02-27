@@ -13,6 +13,8 @@ def connect_db(app):
 
 class User(db.Model):
     """ User model """
+
+    feedback = db.relationship('Feedback', backref='user')
      
     __tablename__ = "users"
 
@@ -52,6 +54,12 @@ class User(db.Model):
         else:
             return False
 
+    # def authorize(cls, username):
+    # searched_user = User.query.get(username)
+    # user_id = session.get('user_id')
+
+    # if 
+
     # @classmethod
     # def check_if_email_exists(cls, email):
     #     ''' verifies if email is unique'''
@@ -65,3 +73,27 @@ class User(db.Model):
     #     username_in_db = User.query.filter_by(username=username).first()
 
     #     return username_in_db
+
+
+class Feedback(db.Model):
+    ''' Feedback class from users '''
+
+    __tablename__ = "feedback"
+
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True,
+                   )
+
+    title = db.Column(db.String(100),
+                      nullable=False,
+                      )
+
+    content = db.Column(db.Text,
+                        nullable=False,
+                        )
+
+    username = db.Column(db.String(20),
+                         db.ForeignKey('users.username'),
+                         nullable=False,
+                         )

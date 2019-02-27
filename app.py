@@ -1,7 +1,7 @@
-from flask import Flask, render_template, redirect, session 
+from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import User, connect_db, db
-from forms import RegisterUserForm, LoginForm
+from models import User, Feedback, connect_db, db
+from forms import RegisterUserForm, LoginForm, AddFeedbackForm
 
 
 app = Flask(__name__)
@@ -44,7 +44,7 @@ def register_user():
 
         session['user_id'] = new_user.username
         
-        return redirect('/secret')
+        return redirect(f'/users/{new_user.username}')
 
     else:
         return render_template(
@@ -75,13 +75,19 @@ def login_user():
 @app.route('/users/<username>')
 def secret_page(username):
     """ Displays secret page if user is logged in """
+    searched_user = User.query.get(username)
+    user_id = session.get('user_id')
+    
+    if user_id != searched_user.username:
+        flash(f"You must be logged in as {username} to view!")
+        return redirect("/login")
 
-    user = User.query.get(username)
-
-    return render_template('user.html', username=user.username,
-                                        email=user.email,
-                                        first_name=user.first_name,
-                                        last_name=user.last_name)
+    return render_template('user.html',
+                           username=searched_user.username,
+                           email=searched_user.email,
+                           first_name=searched_user.first_name,
+                           last_name=searched_user.last_name,
+                           feedback_list=searched_user.feedback)
 
 
 @app.route('/logout')
@@ -91,3 +97,54 @@ def logout_user():
     session.pop("user_id")
 
     return redirect("/")
+
+
+@app.route('/users/<username>/delete', methods=["POST"])
+def delete_user(username):
+    ''' deletes user from db'''
+    searched_user = User.query.get(username)
+    user_id = session.get('user_id')
+
+    if user_id != searched_user.username:
+        flash(f"You must be logged in as {username} to view!")
+        return redirect("/login")
+
+    user_to_delete = User.query.get(username)
+    db.session.delete(user_to_delete)
+    db.session.commit()
+
+    flash(f'User {username} has successfully been deleted.')
+    return redirect('/login')
+
+
+@app.route('/users/<username>/feedback/add', methods=["GET", "POST"])
+def new_feedback_form(username):
+
+    searched_user = User.query.get(username)
+    user_id = session.get('user_id')
+
+    if user_id != searched_user.username:
+        flash(f"You must be logged in as {username} to view!")
+        return redirect("/login")
+    
+    form = AddFeedbackForm()
+
+    if form.validate_on_submit():
+        
+        title = form.title.data
+        content = form.content.data
+        username_key = username
+
+        new_feedback = Feedback(title=title, content=content, username=username_key)
+
+        db.session.add(new_feedback)
+        db.session.commit()
+        
+        return redirect(f'/users/{username}')
+
+    else:
+        return render_template(
+            "add_feedback.html", form=form)
+
+    
+
