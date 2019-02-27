@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from models import User, Feedback, connect_db, db
-from forms import RegisterUserForm, LoginForm, AddFeedbackForm
+from forms import RegisterUserForm, LoginForm, AddFeedbackForm, EditFeedbackForm
 
 
 app = Flask(__name__)
@@ -78,7 +78,7 @@ def secret_page(username):
     searched_user = User.query.get(username)
     user_id = session.get('user_id')
     
-    if user_id != searched_user.username:
+    if searched_user is None or user_id != searched_user.username:
         flash(f"You must be logged in as {username} to view!")
         return redirect("/login")
 
@@ -105,11 +105,12 @@ def delete_user(username):
     searched_user = User.query.get(username)
     user_id = session.get('user_id')
 
-    if user_id != searched_user.username:
+    if searched_user is None or user_id != searched_user.username:
         flash(f"You must be logged in as {username} to view!")
         return redirect("/login")
 
     user_to_delete = User.query.get(username)
+    
     db.session.delete(user_to_delete)
     db.session.commit()
 
@@ -123,7 +124,7 @@ def new_feedback_form(username):
     searched_user = User.query.get(username)
     user_id = session.get('user_id')
 
-    if user_id != searched_user.username:
+    if searched_user is None or user_id != searched_user.username:
         flash(f"You must be logged in as {username} to view!")
         return redirect("/login")
     
@@ -146,5 +147,48 @@ def new_feedback_form(username):
         return render_template(
             "add_feedback.html", form=form)
 
-    
 
+@app.route('/feedback/<int:feedback_id>/update', methods=["GET", "POST"])
+def edit_feedback(feedback_id):
+    """ Edit specified feedback """
+
+    post = Feedback.query.get_or_404(feedback_id)
+    searched_user = post.user
+
+    user_id = session.get('user_id')
+
+    if searched_user is None or user_id != searched_user.username:
+        flash(f"You must be logged in as {searched_user.username} to view!")
+        return redirect("/login")
+
+    form = EditFeedbackForm(obj=post)
+
+    if form.validate_on_submit():
+        
+        post.title = form.title.data
+        post.content = form.content.data
+
+        db.session.commit()
+        
+        return redirect(f'/users/{searched_user.username}')
+
+    else:
+        return render_template(
+            "edit_feedback.html", form=form)
+
+@app.route('/feedback/<int:feedback_id>/delete', methods=["POST"])
+def delete_feedback(feedback_id):
+    
+    post = Feedback.query.get_or_404(feedback_id)
+    searched_user = post.user
+
+    user_id = session.get('user_id')
+
+    if searched_user is None or user_id != searched_user.username:
+        flash(f"You must be logged in as {searched_user.username} to view!")
+        return redirect("/login")
+
+    db.session.delete(post)
+    db.session.commit()
+
+    return redirect(f'/users/{searched_user.username}')

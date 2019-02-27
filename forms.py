@@ -36,3 +36,13 @@ class AddFeedbackForm(FlaskForm):
     
     content = TextAreaField("Content",
                             validators=[Length(min=1)])
+
+
+class EditFeedbackForm(FlaskForm):
+    ''' form for editing feedback '''
+
+    title = StringField("Title",
+                        validators=[Length(min=1, max=100)])
+    
+    content = TextAreaField("Content",
+                            validators=[Length(min=1)])

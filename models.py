@@ -14,7 +14,7 @@ def connect_db(app):
 class User(db.Model):
     """ User model """
 
-    feedback = db.relationship('Feedback', backref='user')
+    feedback = db.relationship('Feedback', cascade="all, delete-orphan")
      
     __tablename__ = "users"
 
@@ -77,6 +77,8 @@ class User(db.Model):
 
 class Feedback(db.Model):
     ''' Feedback class from users '''
+
+    user = db.relationship('User')
 
     __tablename__ = "feedback"
 

@@ -15,8 +15,8 @@
             <h5>{{feedback.title}}</h5>
             <p>{{feedback.content}}</p>
             <form>
-            <button formmethod="/feedback/{{feedback.id}}/update" formaction="GET">Edit</button>
-            <button formmethod="/feedback/{{feedback.id}}/delete" formaction="POST">Delete</button>
+            <button formaction="/feedback/{{feedback.id}}/update" formmethod="GET">Edit</button>
+            <button formaction="/feedback/{{feedback.id}}/delete" formmethod="POST">Delete</button>
             </form>
         </div>
     {% endfor %}
